@@ -15,14 +15,9 @@ const client = new MongoClient(uri, {
 
 async function run() {
     try {
-        // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
-        const database = client.db("meetUp")
-        userCollection = database.collection("users")
+        const database = client.db("meetUp");
+        userCollection = database.collection("users");
 
-        // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } catch (e) {
         console.error(e);
     }
@@ -30,5 +25,5 @@ async function run() {
 run().catch(console.dir);
 
 module.exports = {
-    getUserCollection: () => userCollection, // Export a function that returns the user collection
+    getUserCollection: () => userCollection,
 };
