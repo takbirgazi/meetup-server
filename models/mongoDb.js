@@ -22,9 +22,6 @@ async function run() {
         userCollection = database.collection("users")
         meetingCollection = database.collection("meetings")
 
-        // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } catch (e) {
         console.error(e);
     }
