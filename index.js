@@ -4,6 +4,7 @@ const cors = require('cors');
 const home = require('./routers/home');
 const userRoute = require('./routers/user');
 const jwt = require('jsonwebtoken');
+const meetingRoute = require('./routers/meeting');
 
 
 const app = express();
@@ -17,9 +18,10 @@ app.use(
 );
 
 
-
+// Routes
 app.get('/', home);
 app.use('/', userRoute);
+app.use('/',meetingRoute);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
