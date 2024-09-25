@@ -12,3 +12,4 @@
 - mongodb
 - jsonwebtoken
 - nodemon
+- nodemailer

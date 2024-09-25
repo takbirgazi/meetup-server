@@ -10,4 +10,5 @@ router.post("/create-meeting", verifyToken, createMeeting);
 router.get("/meetings", verifyToken, getMeetings);
 router.get("/meetings/:meetingId", verifyToken, getMeetingById); // New route
 
+
 module.exports = router;
