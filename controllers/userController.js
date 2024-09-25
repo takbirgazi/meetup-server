@@ -1,4 +1,4 @@
-const { getAllUsers, createUser, updateUser, deleteUser } = require("../services/userService");
+const { getAllUsers, createUser, updateUser, deleteUser, searchUser } = require("../services/userService");
 
 
 module.exports = {
@@ -6,5 +6,6 @@ module.exports = {
     post: createUser,
     put: updateUser,
     delete: deleteUser,
+    search: searchUser,
 }
 
