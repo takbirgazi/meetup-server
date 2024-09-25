@@ -6,12 +6,11 @@ const handleCreateMeeting = async (req, res) => {
 
         // const { title, description, date, startTime, endTime, participants } = req.body;
         const meeting = {
-            title: 'dsdsd',
-            description: 'dsdsd',
-            date: 'dsdsd',
-            startTime: 'dsdsd',
-            endTime: 'dsdsd',
-            participants: 'dsdsd'
+            name: req.body.name,
+            email: req.body.email,
+            date: req.body.date,
+            meetingLink: req.body.meetingLink,
+            status: req.body.status,
         }
 
         const result = await meetingCollection.insertOne(meeting);
