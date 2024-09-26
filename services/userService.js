@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const { getUserCollection } = require("../models/mongoDb");
 
 
@@ -23,6 +24,8 @@ async function createUser(req, res) {
         const userCollection = getUserCollection();
         const newUser = req.body;
 
+        // console.log(newUser);
+        // res.send({success: true});
         // Insert the new user into the collection
         const result = await userCollection.insertOne(newUser);
 
@@ -66,9 +69,31 @@ async function deleteUser(req, res) {
     }
 }
 
+async function searchUser(req, res) {
+    try {
+        const userCollection = getUserCollection();
+        const email = req.query.email; // Assuming the user ID is passed in the URL
+
+        // Delete the user document
+        const result = await userCollection.findOne({ email });
+
+        // res.status(200).json(result);
+        // console.log(result);
+        if(result){
+            res.status(200).json({exists: true});
+        }else {
+            res.status(201).json({exists: false});
+        }
+    } catch (error) {
+        console.error("Error in DELETE request:", error);
+        res.status(500).send("Error deleting user");
+    }
+}
+
 module.exports = {
     getAllUsers,
     createUser,
     updateUser,
     deleteUser,
+    searchUser,
 };

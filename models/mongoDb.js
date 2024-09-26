@@ -21,6 +21,7 @@ async function run() {
         const database = client.db("meetUp")
         userCollection = database.collection("users")
         meetingCollection = database.collection("meetings")
+        
 
     } catch (e) {
         console.error(e);
