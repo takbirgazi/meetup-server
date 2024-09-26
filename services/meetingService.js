@@ -1,4 +1,32 @@
+
 const { getMeetingCollection } = require("../models/mongoDb");
+const nodemailer = require('nodemailer');
+
+// Email sending function
+const sendReminderEmail = (meeting) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail', 
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS, 
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: meeting.email,
+    subject: 'Meeting Reminder',
+    text: `Dear ${meeting.name},\n\nThis is a reminder for your meeting scheduled at ${meeting.date}.\n\nMeeting Link: ${meeting.meetingLink}\n\nThank you!`,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error(`Error sending email: ${error.message}`);
+    } else {
+      console.log(`Reminder email sent: ${info.response}`);
+    }
+  });
+};
 
 const handleCreateMeeting = async (req, res) => {
     try {
@@ -25,6 +53,7 @@ const handleCreateMeeting = async (req, res) => {
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
+
 };
 
 const handleGetMeetings = async (req, res) => {
