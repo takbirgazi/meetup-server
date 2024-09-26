@@ -15,7 +15,7 @@ const sendReminderEmail = (meeting) => {
     from: process.env.EMAIL_USER,
     to: meeting.hostEmail,
     subject: "Meeting Reminder",
-    text: `Dear ${meeting.name},\n\nThis is a reminder for your meeting scheduled at ${meeting.date}.\n\nMeeting Link: ${meeting.meetingLink}\n\nThank you!`,
+    text: `Dear ${meeting.hostName},\n\nThis is a reminder for your meeting scheduled at ${meeting.date}.\n\nMeeting Link: ${meeting.meetingLink}\n\nThank you!`,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
@@ -36,6 +36,7 @@ const handleCreateMeeting = async (req, res) => {
     // Instant Meeting & Scheduled Meeting are stored in the same collection
     const meeting = {
       date: req.body.date,
+      hostName: req.body.participants[0].name,
       hostEmail: req.body.participants[0].email,
       meetingLink: req.body.meetingLink,
       meetingId: req.body.meetingId,
