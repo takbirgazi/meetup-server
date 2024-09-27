@@ -3,7 +3,7 @@ require('dotenv').config()
 const cors = require('cors');
 const home = require('./routers/home');
 const userRoute = require('./routers/user');
-const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 const meetingRoute = require('./routers/meeting');
 
 
@@ -11,15 +11,18 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
-app.use(
-    cors({
-        origin: '*',
-    })
-);
+app.use(cors({
+    origin: [
+        'http://localhost:5173',
+    ],
+    credentials: true,
+}));
+app.use(cookieParser());
+
 
 
 // Routes
-app.get('/', home);
+app.use('/', home);
 app.use('/', userRoute);
 app.use('/',meetingRoute);
 
