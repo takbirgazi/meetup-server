@@ -14,17 +14,17 @@ app.use(express.json());
 app.use(cors({
     origin: [
         'http://localhost:5173',
+        'https://tech-thunders-meet.web.app'
     ],
     credentials: true,
 }));
-app.use(cookieParser());
 
 
 
 // Routes
 app.use('/', home);
 app.use('/', userRoute);
-app.use('/',meetingRoute);
+app.use('/', meetingRoute);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
