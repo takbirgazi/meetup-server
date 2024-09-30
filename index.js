@@ -3,7 +3,6 @@ require('dotenv').config()
 const cors = require('cors');
 const home = require('./routers/home');
 const userRoute = require('./routers/user');
-const cookieParser = require('cookie-parser');
 const meetingRoute = require('./routers/meeting');
 
 
