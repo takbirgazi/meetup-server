@@ -9,7 +9,7 @@ const { verifyToken } = require("../services/middlewire");
 
 router.post("/create-meeting", verifyToken, createMeeting);
 router.get("/meetings", verifyToken, getMeetings);
-router.get("/meeting/:meetingId", verifyToken, getMeetingById); // TO DO - get meeting by id for delete and update/edit
+router.get("/meeting/:meetingId", getMeetingById); // TO DO - get meeting by id for delete and update/edit
 router.patch("/meeting/:meetingId", verifyToken, joinmeeting); //  update meeting by id
 
 

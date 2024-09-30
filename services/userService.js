@@ -69,6 +69,23 @@ async function deleteUser(req, res) {
     }
 }
 
+async function loginUser(req, res) {
+    try {
+        const userCollection = getUserCollection();
+        const user = req.body;
+        // console.log(user)
+        const result = await userCollection.findOne({ email: user.email });
+        if (result) {
+            res.status(200).json({ success: true });
+        } else {
+            res.status(401).json({ success: false });
+        }
+    } catch (error) {
+        console.error("Error in POST request:", error);
+        res.status(500).send("Error creating user");
+    }
+}
+
 async function searchUser(req, res) {
     try {
         const userCollection = getUserCollection();
@@ -79,10 +96,10 @@ async function searchUser(req, res) {
 
         // res.status(200).json(result);
         // console.log(result);
-        if(result){
-            res.status(200).json({exists: true});
-        }else {
-            res.status(201).json({exists: false});
+        if (result) {
+            res.status(200).json({ exists: true });
+        } else {
+            res.status(201).json({ exists: false });
         }
     } catch (error) {
         console.error("Error in DELETE request:", error);
@@ -96,4 +113,5 @@ module.exports = {
     updateUser,
     deleteUser,
     searchUser,
+    loginUser
 };
