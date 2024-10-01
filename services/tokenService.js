@@ -10,8 +10,9 @@ function setToken (req, res){
         httpOnly: true,
         secure: true,
         sameSite: 'none',
+        partitioned: true,
     })
-    .send({success: true});
+    .send({success: true, token});
 }
 
 function clearToken (req, res){
