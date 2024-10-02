@@ -73,18 +73,24 @@ async function loginUser(req, res) {
     try {
         const userCollection = getUserCollection();
         const user = req.body;
-        // console.log(user)
+
+        // Check if user already exists
         const result = await userCollection.findOne({ email: user.email });
+
         if (result) {
-            res.status(200).json({ success: true });
+            // If user exists, respond with success
+            res.status(200).json({ success: true, message: "User already exists", user: result });
         } else {
-            res.status(401).json({ success: false });
+            // If user does not exist, insert the new user
+            const newUser = await userCollection.insertOne(user);
+            res.status(201).json({ success: true, message: "New user created", user: newUser });
         }
     } catch (error) {
         console.error("Error in POST request:", error);
-        res.status(500).send("Error creating user");
+        res.status(500).send("Error handling user login/creation");
     }
 }
+
 
 async function searchUser(req, res) {
     try {
