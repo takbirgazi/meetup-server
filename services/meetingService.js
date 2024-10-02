@@ -1,6 +1,13 @@
 const { getMeetingCollection } = require("../models/mongoDb");
 const nodemailer = require("nodemailer");
 
+// Dynamic import for livekit-server-sdk
+// let AccessToken;
+// (async () => {
+//   const livekit = await import("livekit-server-sdk");
+//   AccessToken = livekit.AccessToken;
+// })();
+
 // Email sending function
 const sendReminderEmail = (meeting) => {
   const transporter = nodemailer.createTransport({
@@ -145,6 +152,32 @@ const handleJoinMeeting = async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 };
+
+// const createToken = async (req, res) => {
+//   const roomName = "quickstart-room";
+//   const participantName = "quickstart-username";
+
+//   const at = new AccessToken(
+//     process.env.LIVEKIT_API_KEY,
+//     process.env.LIVEKIT_API_SECRET,
+//     {
+//       identity: participantName,
+//       ttl: "10m",
+//     }
+//   );
+//   at.addGrant({ roomJoin: true, room: roomName });
+
+//   try {
+//     const token = await at.toJwt();
+//     console.log("Generated Livekit Token:", token); // Log the token
+
+//     // Send the token in the response
+//     res.status(200).json({ token });
+//   } catch (error) {
+//     console.error("Error generating token:", error);
+//     res.status(500).json({ error: "Failed to generate token" });
+//   }
+// };
 
 module.exports = {
   handleCreateMeeting,
