@@ -8,6 +8,6 @@ router.get("/", (req, res) => {
 
 router.post("/jwt", setToken);
 
-router.get("/getToken", createToken);
+router.post("/getToken", createToken);
 
 module.exports = router;
