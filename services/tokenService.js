@@ -18,8 +18,8 @@ function setToken(req, res) {
 }
 
 const createToken = async (req, res) => {
-  const roomName = "quickstart-room";
-  const participantName = "quickstart-username";
+  const roomName = req.body.roomName || "quickstart-room";
+  const participantName = req.body.participantName || "participant";
 
   const at = new AccessToken(
     process.env.LIVEKIT_API_KEY,
@@ -33,7 +33,7 @@ const createToken = async (req, res) => {
 
   try {
     const token = await at.toJwt();
-    console.log("Generated Livekit Token:", token); // Log the token
+    // console.log("Generated Livekit Token:", token); // Log the token
 
     // Send the token in the response
     res.status(200).json({ token });
