@@ -1,28 +1,26 @@
-const express = require('express');
-require('dotenv').config()
-const cors = require('cors');
-const home = require('./routers/home');
-const userRoute = require('./routers/user');
-const jwt = require('jsonwebtoken');
-const meetingRoute = require('./routers/meeting');
-
+const express = require("express");
+require("dotenv").config();
+const cors = require("cors");
+const home = require("./routers/home");
+const userRoute = require("./routers/user");
+const meetingRoute = require("./routers/meeting");
 
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
 app.use(
-    cors({
-        origin: '*',
-    })
+  cors({
+    origin: ["http://localhost:5173", "https://tech-thunders-meet.web.app"],
+    credentials: true,
+  })
 );
 
-
 // Routes
-app.get('/', home);
-app.use('/', userRoute);
-app.use('/',meetingRoute);
+app.use("/", home);
+app.use("/", userRoute);
+app.use("/", meetingRoute);
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
