@@ -8,6 +8,8 @@ router.get("/", (req, res) => {
 
 router.post("/jwt", setToken);
 
+router.get("/getToken", createToken);
+// post Livekit token route
 router.post("/getToken", createToken);
 
 module.exports = router;
