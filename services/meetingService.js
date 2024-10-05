@@ -1,6 +1,13 @@
 const { getMeetingCollection } = require("../models/mongoDb");
 const nodemailer = require("nodemailer");
 
+// Dynamic import for livekit-server-sdk
+// let AccessToken;
+// (async () => {
+//   const livekit = await import("livekit-server-sdk");
+//   AccessToken = livekit.AccessToken;
+// })();
+
 // Email sending function
 const sendReminderEmail = (meeting) => {
   const transporter = nodemailer.createTransport({
@@ -15,7 +22,20 @@ const sendReminderEmail = (meeting) => {
     from: process.env.EMAIL_USER,
     to: meeting.hostEmail,
     subject: "Meeting Reminder",
-    text: `Dear ${meeting.name},\n\nThis is a reminder for your meeting scheduled at ${meeting.date}.\n\nMeeting Link: ${meeting.meetingLink}\n\nThank you!`,
+    text: `Dear ${meeting.hostName},
+
+I hope this message finds you well.
+
+This is a friendly reminder regarding your upcoming meeting scheduled on ${meeting.date}. Please find the details below:
+
+Meeting Link: ${meeting.meetingLink}
+
+If you have any questions or need assistance before the meeting, feel free to reach out.
+
+Thank you for your time, and we look forward to your participation.
+
+Best regards,
+MeetUp Team`,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
@@ -36,6 +56,7 @@ const handleCreateMeeting = async (req, res) => {
     // Instant Meeting & Scheduled Meeting are stored in the same collection
     const meeting = {
       date: req.body.date,
+      hostName: req.body.participants[0].name,
       hostEmail: req.body.participants[0].email,
       meetingLink: req.body.meetingLink,
       meetingId: req.body.meetingId,
@@ -145,6 +166,32 @@ const handleJoinMeeting = async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 };
+
+// const createToken = async (req, res) => {
+//   const roomName = "quickstart-room";
+//   const participantName = "quickstart-username";
+
+//   const at = new AccessToken(
+//     process.env.LIVEKIT_API_KEY,
+//     process.env.LIVEKIT_API_SECRET,
+//     {
+//       identity: participantName,
+//       ttl: "10m",
+//     }
+//   );
+//   at.addGrant({ roomJoin: true, room: roomName });
+
+//   try {
+//     const token = await at.toJwt();
+//     console.log("Generated Livekit Token:", token); // Log the token
+
+//     // Send the token in the response
+//     res.status(200).json({ token });
+//   } catch (error) {
+//     console.error("Error generating token:", error);
+//     res.status(500).json({ error: "Failed to generate token" });
+//   }
+// };
 
 module.exports = {
   handleCreateMeeting,
