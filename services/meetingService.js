@@ -1,5 +1,6 @@
 const { getMeetingCollection } = require("../models/mongoDb");
-const nodemailer = require("nodemailer");
+const formData = require("form-data");
+const Mailgun = require("mailgun.js");
 
 // Dynamic import for livekit-server-sdk
 // let AccessToken;
@@ -8,18 +9,16 @@ const nodemailer = require("nodemailer");
 //   AccessToken = livekit.AccessToken;
 // })();
 
-// Email sending function
-const sendReminderEmail = (meeting) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+const mailgun = new Mailgun(formData);
+const mg = mailgun.client({
+  username: "api",
+  key: process.env.MAILGUN_API_KEY,
+});
 
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
+// Email sending function
+const sendReminderEmail = async (meeting) => {
+  const emailData = {
+    from: process.env.SENDER_EMAIL,
     to: meeting.hostEmail,
     subject: "Meeting Reminder",
     text: `Dear ${meeting.hostName},
@@ -38,22 +37,19 @@ Best regards,
 MeetUp Team`,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error(`Error sending email: ${error.message}`);
-    } else {
-      console.log(`Reminder email sent: ${info.response}`);
-    }
-  });
+  try {
+    const msg = await mg.messages.create(process.env.MAILGUN_DOMAIN, emailData);
+    console.log(`Reminder email sent: ${msg.id}`);
+  } catch (err) {
+    console.error(`Error sending email: ${err}`);
+    // You might want to implement additional error handling here
+  }
 };
 
 const handleCreateMeeting = async (req, res) => {
   try {
     const meetingCollection = getMeetingCollection();
-    // console.log(req.body);
 
-    // const { title, description, date, startTime, endTime, participants } = req.body;
-    // Instant Meeting & Scheduled Meeting are stored in the same collection
     const meeting = {
       date: req.body.date,
       hostName: req.body.participants[0].name,
@@ -72,15 +68,12 @@ const handleCreateMeeting = async (req, res) => {
     const result = await meetingCollection.insertOne(meeting);
     res.status(201).send(result);
 
-    //IMPORTANT: Schedule email to be sent 10 minutes before the meeting
-
     const meetingTime = new Date(meeting.date);
     const reminderTime = new Date(meetingTime.getTime() - 15 * 60 * 1000);
 
     const now = new Date();
     const timeUntilReminder = reminderTime - now;
 
-    // If the meeting is scheduled in the future, set the email reminder
     if (timeUntilReminder > 0) {
       setTimeout(() => sendReminderEmail(meeting), timeUntilReminder);
     }
