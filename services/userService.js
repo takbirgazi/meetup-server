@@ -39,13 +39,19 @@ async function createUser(req, res) {
 async function updateUser(req, res) {
   try {
     const userCollection = getUserCollection();
-    const userId = req.params.id; // Assuming the user ID is passed in the URL
     const updatedData = req.body;
+
+    // console.log(updatedData)
 
     // Update the user document
     const result = await userCollection.updateOne(
-      { _id: userId },
-      { $set: updatedData }
+      { email: updatedData.email },
+      { $set: 
+        {
+          userName: updatedData?.userName,
+          photoURL: updatedData?.photoURL,
+        }
+       }
     );
 
     res.status(200).json(result);

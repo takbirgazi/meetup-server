@@ -20,7 +20,7 @@ function setToken(req, res) {
 const createToken = async (req, res) => {
   const roomName = req.body.roomName || "quickstart-room";
   const participantName = req.body.participantName || "participant";
-
+  console.log(roomName, participantName)
   const at = new AccessToken(
     process.env.LIVEKIT_API_KEY,
     process.env.LIVEKIT_API_SECRET,
