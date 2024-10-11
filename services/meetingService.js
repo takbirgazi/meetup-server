@@ -40,15 +40,16 @@ MeetUp Team`,
   try {
     const msg = await mg.messages.create(process.env.MAILGUN_DOMAIN, emailData);
     console.log(`Reminder email sent: ${msg.id}`);
+    return true;
   } catch (err) {
     console.error(`Error sending email: ${err}`);
-    // You might want to implement additional error handling here
+    return false;
   }
 };
 
 const handleCreateMeeting = async (req, res) => {
   try {
-    const meetingCollection = getMeetingCollection();
+    const meetingCollection = await getMeetingCollection();
 
     const meeting = {
       date: req.body.date,
@@ -66,7 +67,13 @@ const handleCreateMeeting = async (req, res) => {
     };
 
     const result = await meetingCollection.insertOne(meeting);
-    res.status(201).send(result);
+
+    // Send immediate confirmation email
+    const emailSent = await sendReminderEmail(meeting);
+
+    if (!emailSent) {
+      console.error("Failed to send confirmation email");
+    }
 
     const meetingTime = new Date(meeting.date);
     const reminderTime = new Date(meetingTime.getTime() - 15 * 60 * 1000);
@@ -75,9 +82,18 @@ const handleCreateMeeting = async (req, res) => {
     const timeUntilReminder = reminderTime - now;
 
     if (timeUntilReminder > 0) {
-      setTimeout(() => sendReminderEmail(meeting), timeUntilReminder);
+      // Schedule reminder email
+      setTimeout(async () => {
+        const reminderSent = await sendReminderEmail(meeting);
+        if (!reminderSent) {
+          console.error("Failed to send reminder email");
+        }
+      }, timeUntilReminder);
     }
+
+    res.status(201).send({ ...result, emailSent });
   } catch (error) {
+    console.error("Error in handleCreateMeeting:", error);
     res.status(500).send({ error: error.message });
   }
 };
