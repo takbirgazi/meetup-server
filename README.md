@@ -13,4 +13,4 @@
 - mongodb
 - jsonwebtoken
 - nodemon
-- nodemailer
+- mailgun
