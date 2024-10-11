@@ -3,6 +3,7 @@
 [Live Link](https://meetup-server-nine.vercel.app)
 
 <!-- packages -->
++ package
 
 **NPM install**
 
@@ -12,4 +13,4 @@
 - mongodb
 - jsonwebtoken
 - nodemon
-- nodemailer
+- mailgun
