@@ -1,6 +1,7 @@
 const connectDB = require("../models/mongoDb");
 const { getMeetingCollection } = require("../models/mongoDb");
-const nodemailer = require("nodemailer");
+const formData = require("form-data");
+const Mailgun = require("mailgun.js");
 
 // Dynamic import for livekit-server-sdk
 // let AccessToken;
@@ -9,18 +10,16 @@ const nodemailer = require("nodemailer");
 //   AccessToken = livekit.AccessToken;
 // })();
 
-// Email sending function
-const sendReminderEmail = (meeting) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+const mailgun = new Mailgun(formData);
+const mg = mailgun.client({
+  username: "api",
+  key: process.env.MAILGUN_API_KEY,
+});
 
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
+// Email sending function
+const sendReminderEmail = async (meeting) => {
+  const emailData = {
+    from: process.env.SENDER_EMAIL,
     to: meeting.hostEmail,
     subject: "Meeting Reminder",
     text: `Dear ${meeting.hostName},
@@ -39,23 +38,20 @@ Best regards,
 MeetUp Team`,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error(`Error sending email: ${error.message}`);
-    } else {
-      console.log(`Reminder email sent: ${info.response}`);
-    }
-  });
+  try {
+    const msg = await mg.messages.create(process.env.MAILGUN_DOMAIN, emailData);
+    console.log(`Reminder email sent: ${msg.id}`);
+    return true;
+  } catch (err) {
+    console.error(`Error sending email: ${err}`);
+    return false;
+  }
 };
 
 const handleCreateMeeting = async (req, res) => {
   try {
-    const db = await connectDB();
-    const meetingCollection = await db.collection('meetings');
-    // console.log(req.body);
+    const meetingCollection = await getMeetingCollection();
 
-    // const { title, description, date, startTime, endTime, participants } = req.body;
-    // Instant Meeting & Scheduled Meeting are stored in the same collection
     const meeting = {
       date: req.body.date,
       hostName: req.body.participants[0].name,
@@ -72,9 +68,13 @@ const handleCreateMeeting = async (req, res) => {
     };
 
     const result = await meetingCollection.insertOne(meeting);
-    res.status(201).send(result);
 
-    //IMPORTANT: Schedule email to be sent 10 minutes before the meeting
+    // Send immediate confirmation email
+    const emailSent = await sendReminderEmail(meeting);
+
+    if (!emailSent) {
+      console.error("Failed to send confirmation email");
+    }
 
     const meetingTime = new Date(meeting.date);
     const reminderTime = new Date(meetingTime.getTime() - 15 * 60 * 1000);
@@ -82,11 +82,19 @@ const handleCreateMeeting = async (req, res) => {
     const now = new Date();
     const timeUntilReminder = reminderTime - now;
 
-    // If the meeting is scheduled in the future, set the email reminder
     if (timeUntilReminder > 0) {
-      setTimeout(() => sendReminderEmail(meeting), timeUntilReminder);
+      // Schedule reminder email
+      setTimeout(async () => {
+        const reminderSent = await sendReminderEmail(meeting);
+        if (!reminderSent) {
+          console.error("Failed to send reminder email");
+        }
+      }, timeUntilReminder);
     }
+
+    res.status(201).send({ ...result, emailSent });
   } catch (error) {
+    console.error("Error in handleCreateMeeting:", error);
     res.status(500).send({ error: error.message });
   }
 };
