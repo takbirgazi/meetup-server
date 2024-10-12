@@ -101,8 +101,7 @@ const handleCreateMeeting = async (req, res) => {
 
 const handleGetMeetings = async (req, res) => {
   try {
-    const db = await connectDB();
-    const meetingCollection = await db.collection('meetings');
+    const meetingCollection = await getMeetingCollection();
     const result = await meetingCollection.find().toArray();
     res.status(200).send(result);
   } catch (error) {
@@ -112,8 +111,7 @@ const handleGetMeetings = async (req, res) => {
 
 const handleGetMeetingById = async (req, res) => {
   try {
-    const db = await connectDB();
-    const meetingCollection = await db.collection('meetings');
+    const meetingCollection = await getMeetingCollection();
     const result = await meetingCollection.findOne({
       meetingId: req.params.meetingId,
     });
@@ -126,8 +124,7 @@ const handleGetMeetingById = async (req, res) => {
 
 const handleJoinMeeting = async (req, res) => {
   try {
-    const db = await connectDB();
-    const meetingCollection = await db.collection('meetings');
+    const meetingCollection = await getMeetingCollection();
     const query = { meetingId: req.params.meetingId };
 
     // Check if the meeting exists
