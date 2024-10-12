@@ -1,5 +1,6 @@
 const { getMeetingCollection } = require("../models/mongoDb");
-const nodemailer = require("nodemailer");
+const formData = require("form-data");
+const Mailgun = require("mailgun.js");
 
 // Dynamic import for livekit-server-sdk
 // let AccessToken;
@@ -8,19 +9,16 @@ const nodemailer = require("nodemailer");
 //   AccessToken = livekit.AccessToken;
 // })();
 
-// Email sending function
-const sendReminderEmail = (meeting) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    secure: true,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+const mailgun = new Mailgun(formData);
+const mg = mailgun.client({
+  username: "api",
+  key: process.env.MAILGUN_API_KEY,
+});
 
-  const mailOptions = {
-    from: `"MeetUp" <${process.env.EMAIL_USER}>`,
+// Email sending function
+const sendReminderEmail = async (meeting) => {
+  const emailData = {
+    from: `"MeetUp" <${process.env.SENDER_EMAIL}>`,
     to: meeting.hostEmail,
     subject: "Meeting Reminder",
     text: `Dear ${meeting.hostName},
@@ -39,13 +37,14 @@ Best regards,
 MeetUp Team`,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error(`Error sending email: ${error.message}`);
-    } else {
-      console.log(`Reminder email sent: ${info.response}`);
-    }
-  });
+  try {
+    const msg = await mg.messages.create(process.env.MAILGUN_DOMAIN, emailData);
+    console.log(`Reminder email sent: ${msg.id}`);
+    return true;
+  } catch (err) {
+    console.error(`Error sending email: ${err}`);
+    return false;
+  }
 };
 
 const handleCreateMeeting = async (req, res) => {
