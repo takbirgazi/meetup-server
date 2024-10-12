@@ -1,6 +1,5 @@
 const { getMeetingCollection } = require("../models/mongoDb");
-const formData = require("form-data");
-const Mailgun = require("mailgun.js");
+const nodemailer = require("nodemailer");
 
 // Dynamic import for livekit-server-sdk
 // let AccessToken;
@@ -9,16 +8,19 @@ const Mailgun = require("mailgun.js");
 //   AccessToken = livekit.AccessToken;
 // })();
 
-const mailgun = new Mailgun(formData);
-const mg = mailgun.client({
-  username: "api",
-  key: process.env.MAILGUN_API_KEY,
-});
-
 // Email sending function
-const sendReminderEmail = async (meeting) => {
-  const emailData = {
-    from: process.env.SENDER_EMAIL,
+const sendReminderEmail = (meeting) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: `"MeetUp" <${process.env.EMAIL_USER}>`,
     to: meeting.hostEmail,
     subject: "Meeting Reminder",
     text: `Dear ${meeting.hostName},
@@ -37,20 +39,22 @@ Best regards,
 MeetUp Team`,
   };
 
-  try {
-    const msg = await mg.messages.create(process.env.MAILGUN_DOMAIN, emailData);
-    console.log(`Reminder email sent: ${msg.id}`);
-    return true;
-  } catch (err) {
-    console.error(`Error sending email: ${err}`);
-    return false;
-  }
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error(`Error sending email: ${error.message}`);
+    } else {
+      console.log(`Reminder email sent: ${info.response}`);
+    }
+  });
 };
 
 const handleCreateMeeting = async (req, res) => {
   try {
-    const meetingCollection = await getMeetingCollection();
+    const meetingCollection = getMeetingCollection();
+    // console.log(req.body);
 
+    // const { title, description, date, startTime, endTime, participants } = req.body;
+    // Instant Meeting & Scheduled Meeting are stored in the same collection
     const meeting = {
       date: req.body.date,
       hostName: req.body.participants[0].name,
@@ -67,33 +71,25 @@ const handleCreateMeeting = async (req, res) => {
     };
 
     const result = await meetingCollection.insertOne(meeting);
+    res.status(201).send(result);
 
-    // Send immediate confirmation email
-    const emailSent = await sendReminderEmail(meeting);
-
-    if (!emailSent) {
-      console.error("Failed to send confirmation email");
+    if (meeting.status === "scheduled") {
+      sendReminderEmail(meeting);
     }
 
-    const meetingTime = new Date(meeting.date);
-    const reminderTime = new Date(meetingTime.getTime() - 15 * 60 * 1000);
+    //IMPORTANT: Schedule email to be sent 10 minutes before the meeting
 
-    const now = new Date();
-    const timeUntilReminder = reminderTime - now;
+    // const meetingTime = new Date(meeting.date);
+    // const reminderTime = new Date(meetingTime.getTime() - 15 * 60 * 1000);
 
-    if (timeUntilReminder > 0) {
-      // Schedule reminder email
-      setTimeout(async () => {
-        const reminderSent = await sendReminderEmail(meeting);
-        if (!reminderSent) {
-          console.error("Failed to send reminder email");
-        }
-      }, timeUntilReminder);
-    }
+    // const now = new Date();
+    // const timeUntilReminder = reminderTime - now;
 
-    res.status(201).send({ ...result, emailSent });
+    // // If the meeting is scheduled in the future, set the email reminder
+    // if (timeUntilReminder > 0) {
+    //   setTimeout(() => sendReminderEmail(meeting), timeUntilReminder);
+    // }
   } catch (error) {
-    console.error("Error in handleCreateMeeting:", error);
     res.status(500).send({ error: error.message });
   }
 };
