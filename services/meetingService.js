@@ -19,7 +19,7 @@ const mg = mailgun.client({
 // Email sending function
 const sendReminderEmail = async (meeting) => {
   const emailData = {
-    from: process.env.SENDER_EMAIL,
+    from: `"MeetUp" <${process.env.SENDER_EMAIL}>`,
     to: meeting.hostEmail,
     subject: "Meeting Reminder",
     text: `Dear ${meeting.hostName},
@@ -69,30 +69,11 @@ const handleCreateMeeting = async (req, res) => {
 
     const result = await meetingCollection.insertOne(meeting);
 
-    // Send immediate confirmation email
-    const emailSent = await sendReminderEmail(meeting);
-
-    if (!emailSent) {
-      console.error("Failed to send confirmation email");
+    if (meeting.status === "scheduled") {
+      sendReminderEmail(meeting);
     }
 
-    const meetingTime = new Date(meeting.date);
-    const reminderTime = new Date(meetingTime.getTime() - 15 * 60 * 1000);
-
-    const now = new Date();
-    const timeUntilReminder = reminderTime - now;
-
-    if (timeUntilReminder > 0) {
-      // Schedule reminder email
-      setTimeout(async () => {
-        const reminderSent = await sendReminderEmail(meeting);
-        if (!reminderSent) {
-          console.error("Failed to send reminder email");
-        }
-      }, timeUntilReminder);
-    }
-
-    res.status(201).send({ ...result, emailSent });
+    res.status(201).send({ result });
   } catch (error) {
     console.error("Error in handleCreateMeeting:", error);
     res.status(500).send({ error: error.message });
