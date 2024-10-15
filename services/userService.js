@@ -1,10 +1,11 @@
-const { ObjectId } = require("mongodb");
-const { getUserCollection } = require("../models/mongoDb");
+const { getUserCollection } = require('../models/mongoDb');
 
 // Function to retrieve all users (for GET request)
 async function getAllUsers(req, res) {
   try {
-    const userCollection = getUserCollection(); // Get the user collection
+    // const db = await connectDB();
+    // const userCollection = await db.collection('users') // Get the user collection
+    const userCollection = await getUserCollection(); // Get the user collection
 
     // Query the collection to find all users
     const users = await userCollection.find({}).toArray();
@@ -20,7 +21,7 @@ async function getAllUsers(req, res) {
 // Function to create a new user (for POST request)
 async function createUser(req, res) {
   try {
-    const userCollection = getUserCollection();
+    const userCollection = await getUserCollection();
     const newUser = req.body;
 
     // console.log(newUser);
@@ -38,14 +39,22 @@ async function createUser(req, res) {
 // Function to update a user (for PUT request)
 async function updateUser(req, res) {
   try {
-    const userCollection = getUserCollection();
+    const userCollection = await getUserCollection();
     const userId = req.params.id; // Assuming the user ID is passed in the URL
     const updatedData = req.body;
 
+    // console.log(updatedData)
+
     // Update the user document
     const result = await userCollection.updateOne(
-      { _id: userId },
-      { $set: updatedData }
+      { email: updatedData.email },
+      {
+        $set:
+        {
+          userName: updatedData?.userName,
+          photoURL: updatedData?.photoURL,
+        }
+      }
     );
 
     res.status(200).json(result);
@@ -58,7 +67,7 @@ async function updateUser(req, res) {
 // Function to delete a user (for DELETE request)
 async function deleteUser(req, res) {
   try {
-    const userCollection = getUserCollection();
+    const userCollection = await getUserCollection();
     const userId = req.params.id; // Assuming the user ID is passed in the URL
 
     // Delete the user document
@@ -73,7 +82,7 @@ async function deleteUser(req, res) {
 
 async function loginUser(req, res) {
   try {
-    const userCollection = getUserCollection();
+    const userCollection = await getUserCollection();
     const user = req.body;
 
     // Check if user already exists
@@ -99,7 +108,7 @@ async function loginUser(req, res) {
 
 async function searchUser(req, res) {
   try {
-    const userCollection = getUserCollection();
+    const userCollection = await getUserCollection();
     const email = req.query.email; // Assuming the user ID is passed in the URL
 
     // Delete the user document

@@ -49,11 +49,8 @@ MeetUp Team`,
 
 const handleCreateMeeting = async (req, res) => {
   try {
-    const meetingCollection = getMeetingCollection();
-    // console.log(req.body);
+    const meetingCollection = await getMeetingCollection();
 
-    // const { title, description, date, startTime, endTime, participants } = req.body;
-    // Instant Meeting & Scheduled Meeting are stored in the same collection
     const meeting = {
       date: req.body.date,
       hostName: req.body.participants[0].name,
@@ -70,32 +67,21 @@ const handleCreateMeeting = async (req, res) => {
     };
 
     const result = await meetingCollection.insertOne(meeting);
-    res.status(201).send(result);
 
     if (meeting.status === "scheduled") {
       sendReminderEmail(meeting);
     }
 
-    //IMPORTANT: Schedule email to be sent 10 minutes before the meeting
-
-    // const meetingTime = new Date(meeting.date);
-    // const reminderTime = new Date(meetingTime.getTime() - 15 * 60 * 1000);
-
-    // const now = new Date();
-    // const timeUntilReminder = reminderTime - now;
-
-    // // If the meeting is scheduled in the future, set the email reminder
-    // if (timeUntilReminder > 0) {
-    //   setTimeout(() => sendReminderEmail(meeting), timeUntilReminder);
-    // }
+    res.status(201).send({ result });
   } catch (error) {
+    console.error("Error in handleCreateMeeting:", error);
     res.status(500).send({ error: error.message });
   }
 };
 
 const handleGetMeetings = async (req, res) => {
   try {
-    const meetingCollection = getMeetingCollection();
+    const meetingCollection = await getMeetingCollection();
     const result = await meetingCollection.find().toArray();
     res.status(200).send(result);
   } catch (error) {
@@ -105,7 +91,7 @@ const handleGetMeetings = async (req, res) => {
 
 const handleGetMeetingById = async (req, res) => {
   try {
-    const meetingCollection = getMeetingCollection();
+    const meetingCollection = await getMeetingCollection();
     const result = await meetingCollection.findOne({
       meetingId: req.params.meetingId,
     });
@@ -118,7 +104,7 @@ const handleGetMeetingById = async (req, res) => {
 
 const handleJoinMeeting = async (req, res) => {
   try {
-    const meetingCollection = getMeetingCollection();
+    const meetingCollection = await getMeetingCollection();
     const query = { meetingId: req.params.meetingId };
 
     // Check if the meeting exists
