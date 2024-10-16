@@ -14,3 +14,4 @@
 - jsonwebtoken
 - nodemon
 - mailgun
+- bcrypt
