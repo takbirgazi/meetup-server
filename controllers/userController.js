@@ -5,6 +5,7 @@ const {
   deleteUser,
   searchUser,
   loginUser,
+  changeOrSetPassword,
 } = require("../services/userService");
 
 module.exports = {
@@ -14,4 +15,5 @@ module.exports = {
   put: updateUser,
   delete: deleteUser,
   search: searchUser,
+  modifyPassword: changeOrSetPassword,
 };

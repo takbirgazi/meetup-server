@@ -1,4 +1,5 @@
 const { getUserCollection } = require('../models/mongoDb');
+const bcrypt = require("bcrypt");
 
 // Function to retrieve all users (for GET request)
 async function getAllUsers(req, res) {
@@ -109,23 +110,63 @@ async function loginUser(req, res) {
 async function searchUser(req, res) {
   try {
     const userCollection = await getUserCollection();
-    const email = req.query.email; // Assuming the user ID is passed in the URL
+    const email = req.query.email; // Assuming email is passed in the URL
 
-    // Delete the user document
+    // Find the user by email
     const result = await userCollection.findOne({ email });
 
-    // res.status(200).json(result);
-    // console.log(result);
     if (result) {
-      res.status(200).json({ exists: true });
+      // Check if the password field is present and not empty
+      const hasPassword = result.password.trim() !== "";
+
+      res.status(200).json({ exists: true, hasPassword });
     } else {
       res.status(201).json({ exists: false });
     }
   } catch (error) {
-    console.error("Error in DELETE request:", error);
-    res.status(500).send("Error deleting user");
+    console.error("Error in searchUser request:", error);
+    res.status(500).send("Error searching for user");
   }
 }
+
+// Function to change or set a password
+async function changeOrSetPassword(req, res) {
+  const { email, currentPassword, newPassword } = req.body;
+
+  try {
+    const userCollection = await getUserCollection();
+    const user = await userCollection.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the user already has a password set
+    if (user.password) {
+      // User already has a password - check if currentPassword matches the saved one
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+      if (!isMatch) {
+        return res.status(400).json({ message: "Current password is incorrect" });
+      }
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password in the database (partial update)
+    await userCollection.updateOne(
+      { email },
+      { $set: { password: hashedPassword } }
+    );
+
+    return res.status(200).json({ message: user.password ? "Password changed" : "Password set successfully" });
+  } catch (error) {
+    console.error("Error updating password:", error);
+    return res.status(500).json({ message: "Error updating password" });
+  }
+}
+
 
 module.exports = {
   getAllUsers,
@@ -134,4 +175,5 @@ module.exports = {
   deleteUser,
   searchUser,
   loginUser,
+  changeOrSetPassword,
 };

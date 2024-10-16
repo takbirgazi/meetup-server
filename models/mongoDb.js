@@ -19,8 +19,8 @@ async function connectToDatabase() {
         deprecationErrors: true,
       },
       // Add these options for better performance in serverless environments
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      // useNewUrlParser: true,
+      // useUnifiedTopology: true,
       maxPoolSize: 10, // Adjust based on your needs
     });
 
