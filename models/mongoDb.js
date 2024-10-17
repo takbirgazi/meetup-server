@@ -1,14 +1,15 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pgsiu4c.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 let client;
 let userCollection;
 let meetingCollection;
+let toDoCollection;
 
 async function connectToDatabase() {
   if (client && client.topology && client.topology.isConnected()) {
-    return { userCollection, meetingCollection };
+    return { userCollection, meetingCollection, toDoCollection };
   }
 
   try {
@@ -33,7 +34,7 @@ async function connectToDatabase() {
     //hafsa
     toDoCollection = database.collection("toDo");
 
-    return { userCollection, meetingCollection };
+    return { userCollection, meetingCollection, toDoCollection };
   } catch (error) {
     console.error("Failed to connect to MongoDB:", error);
     throw error;
@@ -69,4 +70,5 @@ module.exports = {
   getMeetingCollection,
   getToDoCollection,
   closeConnection,
+  ObjectId,
 };
