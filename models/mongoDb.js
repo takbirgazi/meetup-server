@@ -30,6 +30,8 @@ async function connectToDatabase() {
     const database = client.db("meetUp");
     userCollection = database.collection("users");
     meetingCollection = database.collection("meetings");
+    //hafsa
+    toDoCollection = database.collection("toDo");
 
     return { userCollection, meetingCollection };
   } catch (error) {
@@ -48,6 +50,12 @@ async function getMeetingCollection() {
   return meetingCollection;
 }
 
+//hafsa
+async function getToDoCollection() {
+  const { toDoCollection } = await connectToDatabase();
+  return toDoCollection;
+}
+
 // This function can be used to explicitly close the connection if needed
 async function closeConnection() {
   if (client) {
@@ -59,5 +67,6 @@ async function closeConnection() {
 module.exports = {
   getUserCollection,
   getMeetingCollection,
+  getToDoCollection,
   closeConnection,
 };
