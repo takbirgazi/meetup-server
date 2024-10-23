@@ -1,35 +1,74 @@
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pgsiu4c.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
-let userCollection; // Define a variable to store the user collection
-let meetingCollection; // Define a variable to store the meeting collection
+let client;
+let userCollection;
+let meetingCollection;
+let toDoCollection;
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-    serverApi: {
+async function connectToDatabase() {
+  if (client && client.topology && client.topology.isConnected()) {
+    return { userCollection, meetingCollection, toDoCollection };
+  }
+
+  try {
+    client = new MongoClient(uri, {
+      serverApi: {
         version: ServerApiVersion.v1,
         strict: true,
         deprecationErrors: true,
-    }
-});
+      },
+      // Add these options for better performance in serverless environments
+      // useNewUrlParser: true,
+      // useUnifiedTopology: true,
+      maxPoolSize: 10, // Adjust based on your needs
+    });
 
-async function run() {
-    try {
-        // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
-        const database = client.db("meetUp")
-        userCollection = database.collection("users")
-        meetingCollection = database.collection("meetings")
-        
+    await client.connect();
+    console.log("Connected to MongoDB");
 
-    } catch (e) {
-        console.error(e);
-    }
+    const database = client.db("meetUp");
+    userCollection = database.collection("users");
+    meetingCollection = database.collection("meetings");
+    //hafsa
+    toDoCollection = database.collection("toDo");
+
+    return { userCollection, meetingCollection, toDoCollection };
+  } catch (error) {
+    console.error("Failed to connect to MongoDB:", error);
+    throw error;
+  }
 }
-run().catch(console.dir);
+
+async function getUserCollection() {
+  const { userCollection } = await connectToDatabase();
+  return userCollection;
+}
+
+async function getMeetingCollection() {
+  const { meetingCollection } = await connectToDatabase();
+  return meetingCollection;
+}
+
+//hafsa
+async function getToDoCollection() {
+  const { toDoCollection } = await connectToDatabase();
+  return toDoCollection;
+}
+
+// This function can be used to explicitly close the connection if needed
+async function closeConnection() {
+  if (client) {
+    await client.close();
+    console.log("MongoDB connection closed");
+  }
+}
 
 module.exports = {
-    getUserCollection: () => userCollection, // Export a function that returns the user collection
-    getMeetingCollection: () => meetingCollection // Export a function that returns the meeting collection
+  getUserCollection,
+  getMeetingCollection,
+  getToDoCollection,
+  closeConnection,
+  ObjectId,
 };

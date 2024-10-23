@@ -13,4 +13,5 @@
 - mongodb
 - jsonwebtoken
 - nodemon
-- nodemailer
+- mailgun
+- bcrypt

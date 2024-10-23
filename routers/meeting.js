@@ -4,7 +4,6 @@ const {
   getMeetings,
   getMeetingById,
   joinmeeting,
- 
 } = require("../controllers/meetingController");
 const { verifyToken } = require("../services/middlewire");
 
