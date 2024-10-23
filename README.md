@@ -1,11 +1,19 @@
-# MeetUp Server
+# MeetUP - Video Calling Web Application
 
-[Live Link](https://meetup-server-nine.vercel.app)
+**Installation Guide**
 
-<!-- packages -->
-+ package
+* npm install
+* Create .env.local file and insert the variable and values
+    * VITE_apiKey
+    * VITE_authDomain
+    * VITE_projectId
+    * VITE_storageBucket
+    * VITE_messagingSenderId
+    * VITE_appId
+    * VITE_API_URL
+    * VITE_GEMENI_API_KEY
 
-**NPM install**
+**NPM as been used**
 
 - express
 - cors
