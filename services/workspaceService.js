@@ -1,29 +1,47 @@
+const { getWorkspaceCollection, ObjectId } = require("../models/mongoDb");
 
-async function handleCreateWorkspace{
-    // Create a new workspace
-    // Return the workspace
-    // If there is an error, return the error 
+const handleCreateWorkspace = async (req, res) => {
+    try {
+        const workspace = req.body;
+        const workspaceCollection = await getWorkspaceCollection();
+
+        isExist = await workspaceCollection.findOne({ name: workspace.taskTitle, email: workspace.taskHost });
+        if (isExist) {
+            res.status(400).send({ message: "Workspace already exists" });
+            return;
+        }
+        const result = await workspaceCollection.insertOne(workspace);
+        res.status(201).send(result);
+    }
+    catch (error) {
+        console.error("Error in createWorkspace:", error);
+        res.status(500).send({ error: error.message });
+    }
+}
+const handleGetWorkspaces = async (req, res) => {
 }
 
-async function handleGetWorkspaces{
-    // Get all workspaces
-    // Return the workspaces
-    // If there is an error, return the error 
+const handleGetWorkspaceByemail = async (req, res) => {
+    try {
+        const email = req.body.email;
+        // console.log(email)
+        const workspaceCollection = await getWorkspaceCollection();
+        const result = await workspaceCollection.find({ email: email }).toArray();
+        res.status(200).send(result);
+    }
+    catch (error) {
+        console.error("Error in getWorkspaceByEmail:", error);
+        res.status(500).send({ error: error.message });
+    }
 }
 
-async function handleGetWorkspaceById{
-    // Get a workspace by id
-    // Return the workspace
-    // If there is an error, return the error 
-}
-
-async function handleUpdateWorkspace{
+const handleUpdateWorkspace = async (req, res) => {
     // Update a workspace
     // Return the updated workspace
     // If there is an error, return the error 
-} 
+}
 
-async function handleDeleteWorkspace{
+const handleDeleteWorkspace = async (req, res) => {
     // Delete a workspace
     // Return the deleted workspace
     // If there is an error, return the error 
@@ -33,7 +51,7 @@ async function handleDeleteWorkspace{
 module.exports = {
     handleCreateWorkspace,
     handleGetWorkspaces,
-    handleGetWorkspaceById,
+    handleGetWorkspaceByemail,
     handleUpdateWorkspace,
     handleDeleteWorkspace,
 

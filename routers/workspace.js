@@ -1,11 +1,12 @@
-const { createWorkspace, getWorkspaces, getWorkspaceById, updateWorkspace, deleteWorkspace } = require("../controllers/workspaceController");
+const { createWorkspace, getWorkspaces, getWorkspaceByEmail, updateWorkspace, deleteWorkspace } = require("../controllers/workspaceController");
+const { verifyToken } = require("../services/middlewire");
 
 const router = require("express").Router();
 
-router.post("/workspaces", createWorkspace);
+router.post("/workspaces", verifyToken, createWorkspace);
 router.get("/workspaces", getWorkspaces);
-router.get("/workspaces/:id", getWorkspaceById);
-router.put("/workspaces/:id", updateWorkspace);
-router.delete("/workspaces/:id", deleteWorkspace);
+router.get("/workspaces/:email", verifyToken, getWorkspaceByEmail);
+router.put("/workspaces/:id", verifyToken, updateWorkspace);
+router.delete("/workspaces/:id", verifyToken, deleteWorkspace);
 
 module.exports = router;

@@ -1,11 +1,9 @@
 const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
-const bodyParser = require("body-parser");
 const home = require("./routers/home");
 const userRoute = require("./routers/user");
 const meetingRoute = require("./routers/meeting");
-const chatRoute = require("./routers/chat");
 const todoRoute = require("./routers/todo");
 const workspace = require("./routers/workspace");
 
@@ -24,7 +22,6 @@ app.use(
 app.use("/", home);
 app.use("/", userRoute);
 app.use("/", meetingRoute);
-app.use("/", chatRoute);
 app.use("/", todoRoute);
 app.use("/", workspace);
 

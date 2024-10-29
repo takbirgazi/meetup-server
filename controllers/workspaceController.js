@@ -1,9 +1,9 @@
-const { handleCreateWorkspace, handleGetWorkspaces, handleGetWorkspaceById, handleUpdateWorkspace, handleDeleteWorkspace } = require("../services/workspaceService");
+const { handleCreateWorkspace, handleGetWorkspaces, handleGetWorkspaceByemail, handleUpdateWorkspace, handleDeleteWorkspace } = require("../services/workspaceService");
 
 module.exports = {
     createWorkspace: handleCreateWorkspace,
     getWorkspaces: handleGetWorkspaces,
-    getWorkspaceById: handleGetWorkspaceById,
+    getWorkspaceByEmail:handleGetWorkspaceByemail,
     updateWorkspace: handleUpdateWorkspace,
     deleteWorkspace: handleDeleteWorkspace,
 };
