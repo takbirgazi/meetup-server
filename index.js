@@ -14,7 +14,7 @@ const port = process.env.PORT || 5000;
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://meetup-9da89.web.app"],
+    origin: ["http://localhost:5173", "https://meetup-9da89.web.app" ,"https://meetup-d48c4.web.app"],
     credentials: true,
   })
 );
