@@ -36,9 +36,18 @@ const handleGetWorkspaceByemail = async (req, res) => {
 }
 
 const handleUpdateWorkspace = async (req, res) => {
-    // Update a workspace
-    // Return the updated workspace
-    // If there is an error, return the error 
+    try {
+        const id = req.params.id;
+        const workspace = req.body;
+        const workspaceCollection = await getWorkspaceCollection();
+
+        const result = await workspaceCollection.updateOne({ _id:  new ObjectId(id) }, { $set: workspace });
+        res.status(200).send(result);
+    }
+    catch (error) {
+        console.error("Error in updateWorkspace:", error);
+        res.status(500).send({ error: error.message });
+    }
 }
 
 const handleDeleteWorkspace = async (req, res) => {
