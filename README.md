@@ -1,11 +1,19 @@
-# MeetUp Server
+# MeetUP - Video Calling Web Application
 
-[Live Link](https://meetup-server-nine.vercel.app)
+**Installation Guide**
 
-<!-- packages -->
-+ package
+* npm install
+* Create .env.local file and insert the variables and values
+    * PORT
+    * DB_USER
+    * DB_PASS
+    * ACCESS_TOKEN_SECRET
+    * MAILGUN_API_KEY
+    * MAILGUN_DOMAIN
+    * SENDER_EMAIL
 
-**NPM install**
+
+**NPM as been used**
 
 - express
 - cors
