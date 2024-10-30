@@ -1,3 +1,4 @@
+const moment = require("moment");
 const { getToDoCollection, ObjectId } = require("../models/mongoDb");
 
 const createTask = async (req, res) => {
@@ -8,6 +9,7 @@ const createTask = async (req, res) => {
       text: req.body.text,
       completed: req.body.completed,
       email: req.body.email,
+      createdAt: moment().format("DD MMM YYYY HH:mm A"),
     };
 
     const result = await toDoCollection.insertOne(task);
@@ -28,6 +30,21 @@ const getTask = async (req, res) => {
     res.status(200).send(result);
   } catch (error) {
     console.error("Error in getTask:", error);
+    res.status(500).send({ error: error.message });
+  }
+};
+
+const getSingleTask = async (req, res) => {
+  try {
+    const toDoCollection = await getToDoCollection();
+    const { id } = req.params;
+    const result = await toDoCollection.findOne({ _id: new ObjectId(id) });
+    if (!result) {
+      return res.status(404).send({ message: "Task not found" });
+    }
+    res.status(200).send(result);
+  } catch (error) {
+    console.error("Error in getSingleTask:", error);
     res.status(500).send({ error: error.message });
   }
 };
@@ -77,4 +94,5 @@ module.exports = {
   getTask,
   editTask,
   deleteTask,
+  getSingleTask,
 };
