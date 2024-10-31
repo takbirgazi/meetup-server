@@ -103,6 +103,25 @@ const handleGetMeetingById = async (req, res) => {
   }
 };
 
+const handleGetMeetingByEmail = async (req, res) => {
+  try {
+    const meetingCollection = await getMeetingCollection();
+    const { email } = req.params; // Get email from route parameters
+
+    const result = await meetingCollection.find({
+      $or: [
+        { hostEmail: email },
+        { participants: { $elemMatch: { email: email } } }
+      ]
+    }).toArray();
+
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+};
+
+
 const handleJoinMeeting = async (req, res) => {
   try {
     const meetingCollection = await getMeetingCollection();
@@ -189,4 +208,5 @@ module.exports = {
   handleGetMeetings,
   handleGetMeetingById,
   handleJoinMeeting,
+  handleGetMeetingByEmail,
 };
