@@ -6,11 +6,10 @@ let client;
 let userCollection;
 let meetingCollection;
 let toDoCollection;
-let workspaceCollection;
 
 async function connectToDatabase() {
   if (client && client.topology && client.topology.isConnected()) {
-    return { userCollection, meetingCollection, toDoCollection, workspaceCollection };
+    return { userCollection, meetingCollection, toDoCollection };
   }
 
   try {
@@ -34,9 +33,8 @@ async function connectToDatabase() {
     meetingCollection = database.collection("meetings");
     //hafsa
     toDoCollection = database.collection("toDo");
-    workspaceCollection = database.collection("workspaces");
 
-    return { userCollection, meetingCollection, toDoCollection, workspaceCollection };
+    return { userCollection, meetingCollection, toDoCollection };
   } catch (error) {
     console.error("Failed to connect to MongoDB:", error);
     throw error;
@@ -59,10 +57,6 @@ async function getToDoCollection() {
   return toDoCollection;
 }
 
-async function getWorkspaceCollection() {
-  const { workspaceCollection } = await connectToDatabase();
-  return workspaceCollection;
-}
 
 // This function can be used to explicitly close the connection if needed
 async function closeConnection() {
@@ -77,6 +71,5 @@ module.exports = {
   getMeetingCollection,
   getToDoCollection,
   closeConnection,
-  getWorkspaceCollection,
   ObjectId,
 };
