@@ -3,6 +3,7 @@ const {
   handleGetMeetings,
   handleGetMeetingById,
   handleJoinMeeting,
+  handleGetMeetingByEmail,
   // createToken,
 } = require("../services/meetingService");
 
@@ -11,5 +12,6 @@ module.exports = {
   getMeetings: handleGetMeetings,
   getMeetingById: handleGetMeetingById,
   joinmeeting: handleJoinMeeting,
+  getMeetingByEmail: handleGetMeetingByEmail,
   // getLivekitToken: createToken,
 };
