@@ -5,7 +5,6 @@ const home = require("./routers/home");
 const userRoute = require("./routers/user");
 const meetingRoute = require("./routers/meeting");
 const todoRoute = require("./routers/todo");
-const workspace = require("./routers/workspace");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -23,7 +22,6 @@ app.use("/", home);
 app.use("/", userRoute);
 app.use("/", meetingRoute);
 app.use("/", todoRoute);
-app.use("/", workspace);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
