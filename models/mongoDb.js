@@ -57,6 +57,7 @@ async function getToDoCollection() {
   return toDoCollection;
 }
 
+
 // This function can be used to explicitly close the connection if needed
 async function closeConnection() {
   if (client) {
