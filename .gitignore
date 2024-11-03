@@ -1,7 +1,11 @@
 node_modules
+
 .vercel
-.env.*
+
 .vercel
+
 *.local
+
 .env*.local
-.env
+
+config.bat
