@@ -1,4 +1,5 @@
-node_modules
-.vercel
-.env.*
-.vercel
+node_modules
+.vercel
+.vercel
+config.bat
+.env
